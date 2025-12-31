@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Latih Tubi Multimedia</title>
+  <style>
+    body{
+      font-family:system-ui, Arial, sans-serif;
+      margin:24px;
+      max-width:720px;
+      background:#f9fafb;
+    }
+    h2{margin-bottom:6px}
+    .card{
+      background:#ffffff;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      padding:20px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.05);
+    }
+    label{
+      display:block;
+      margin:12px 0 6px;
+      font-weight:600;
+    }
+    input, select, button{
+      width:100%;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid #d1d5db;
+      font-size:15px;
+    }
+    button{
+      margin-top:16px;
+      background:#2563eb;
+      color:white;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button:hover{background:#1e40af}
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .pill{
+      display:inline-block;
+      background:#eef2ff;
+      color:#1e3a8a;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:13px;
+      margin-top:8px;
+    }
+    .muted{
+      color:#6b7280;
+      font-size:13px;
+      margin-top:8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Latih Tubi Multimedia</h2>
+  <p class="muted">
+    Sains Tingkatan 3 (Bab 1) & Biologi Tingkatan 4 (Bab 1)
+  </p>
+
+  <div class="card">
+    <label>Nama Murid</label>
+    <input id="studentName" placeholder="Contoh: Aiman Hakim" />
+
+    <div class="row">
+      <div>
+        <label>Kelas</label>
+        <select id="className">
+          <option value="3 WISE">3 WISE</option>
+          <option value="3 BRILLIANT">3 BRILLIANT</option>
+          <option value="3 SMART">3 SMART</option>
+          <option value="4 SCIENTIST">4 SCIENTIST</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Subjek (Auto)</label>
+        <div id="subject" class="pill">Sains</div>
+      </div>
+    </div>
+
+    <div id="setInfo" class="muted"></div>
+
+    <button id="startBtn">Mula Latih Tubi</button>
+  </div>
+
+  <script type="module">
+    /*********************************************************
+     * ⚠️ GANTI firebaseConfig INI SELEPAS SETUP FIREBASE
+     *********************************************************/
+    const firebaseConfig = {
+      apiKey: "PASTE_FIREBASE_API_KEY",
+      authDomain: "PASTE_PROJECT.firebaseapp.com",
+      projectId: "PASTE_PROJECT_ID"
+    };
+
+    /*********************************************************
+     * SEMENTARA: TANPA FIREBASE (UNTUK ELAK ERROR)
+     * Firebase code akan diaktifkan kemudian
+     *********************************************************/
+
+    const studentNameEl = document.getElementById("studentName");
+    const classNameEl   = document.getElementById("className");
+    const subjectEl     = document.getElementById("subject");
+    const setInfoEl     = document.getElementById("setInfo");
+    const startBtn      = document.getElementById("startBtn");
+
+    function mapClass(className){
+      if (className.startsWith("3")) {
+        return { subject:"Sains", setId:"SCI_F3_BAB01", dataUrl:"data/SCI_F3_BAB01.json" };
+      }
+      if (className === "4 SCIENTIST") {
+        return { subject:"Biologi", setId:"BIO_F4_BAB01", dataUrl:"data/BIO_F4_BAB01.json" };
+      }
+      return { subject:"Sains", setId:"SCI_F3_BAB01", dataUrl:"data/SCI_F3_BAB01.json" };
+    }
+
+    function updateAuto(){
+      const {subject, setId} = mapClass(classNameEl.value);
+      subjectEl.textContent = subject;
+      setInfoEl.textContent = "Set soalan: " + setId + " (Bab 1)";
+    }
+
+    classNameEl.addEventListener("change", updateAuto);
+    updateAuto();
+
+    startBtn.addEventListener("click", () => {
+      const studentName = studentNameEl.value.trim();
+      const className   = classNameEl.value;
+
+      if (!studentName) {
+        alert("Sila isi nama murid.");
+        return;
+      }
+
+      const ctx = mapClass(className);
+      localStorage.setItem("LT_CONTEXT", JSON.stringify({
+        studentName,
+        className,
+        subject: ctx.subject,
+        setId: ctx.setId,
+        dataUrl: ctx.dataUrl
+      }));
+
+      window.location.href = "quiz.html";
+    });
+  </script>
+
+</body>
+</html>
